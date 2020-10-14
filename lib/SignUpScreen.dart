@@ -1,9 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import 'HomeScreen.dart';
-import 'LogInScreen.dart';
+import 'package:seven_e_sound/LogInScreen.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -11,13 +10,21 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  bool authState = false;
   String email = "", password = "";
   var _formKey = GlobalKey<FormState>();
   final FirebaseAuth auth = FirebaseAuth.instance;
+
   Future<void> register() async {
     // ignore: unused_local_variable
-    User user = (await auth.createUserWithEmailAndPassword(
-        email: email.trim(), password: password)) as User;
+    await auth
+        .createUserWithEmailAndPassword(email: email.trim(), password: password)
+        .then((value) {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => HomeScreen(value.user.email)));
+    });
   }
 
   @override
@@ -71,7 +78,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     }
                     return null;
                   },
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: 'UserName',
                     border: OutlineInputBorder(
@@ -175,10 +182,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
                       register();
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (BuildContext context) => HomeScreen()));
                     }
                   },
                   shape: RoundedRectangleBorder(
@@ -200,33 +203,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
               width: double.infinity,
               height: 1,
               color: Colors.blue,
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 20, left: 20, right: 20),
-              child: RaisedButton(
-                onPressed: () {},
-                color: Colors.blue,
-                padding: EdgeInsets.all(10),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Icon(
-                      FontAwesomeIcons.google,
-                      color: Colors.orange,
-                    ),
-                    SizedBox(width: 10),
-                    Text(
-                      "Sign Up with google",
-                      style: TextStyle(
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             ),
             SizedBox(height: 20),
             Center(

@@ -12,18 +12,44 @@ class LogInScreen extends StatefulWidget {
 }
 
 class _LogInScreenState extends State<LogInScreen> {
+  bool signInState = false;
   String email = "", password = "";
   var _formKey = GlobalKey<FormState>();
-  FirebaseAuth auth = FirebaseAuth.instance;
-  Future<String> logIn() async {
-    String user = (await auth.signInWithEmailAndPassword(
-            email: email.trim(), password: password))
-        .toString();
-    return user;
+
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  Future<void> logIn() async {
+    try {
+      await auth
+          .signInWithEmailAndPassword(
+              email: email.trim(), password: password.trim())
+          .then((value) {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext context) =>
+                    HomeScreen(value.user.email)));
+      });
+    } catch (e) {
+      print("Error ${e.toString()}");
+    }
   }
 
-  GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email']);
-  // Future<void> GoogleSignIn() async {}
+  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email']);
+  Future<void> _handleSignIn() async { 
+    GoogleSignInAccount signInAccount = await _googleSignIn.signIn();
+    GoogleSignInAuthentication signInAuthentication =
+        await signInAccount.authentication;
+    AuthCredential credential = GoogleAuthProvider.credential(
+        idToken: signInAuthentication.idToken,
+        accessToken: signInAuthentication.accessToken);
+    User user = (await auth.signInWithCredential(credential)).user;
+    print(user);
+    setState(() {
+      signInState = true;
+    });
+    return user.email.toString();
+  }
 
   @override
   void initState() {
@@ -31,8 +57,11 @@ class _LogInScreenState extends State<LogInScreen> {
     Future(() async {
       // ignore: await_only_futures
       if (await auth.currentUser != null) {
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (BuildContext conext) => HomeScreen()));
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (BuildContext conext) =>
+                    HomeScreen(auth.currentUser.toString())));
       }
     });
   }
@@ -51,7 +80,6 @@ class _LogInScreenState extends State<LogInScreen> {
               child: Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
-                  //mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     SizedBox(
@@ -169,14 +197,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 child: RaisedButton(
                   onPressed: () {
                     if (_formKey.currentState.validate()) {
-                      Future<String> check = logIn();
-                      if (check != null) {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    HomeScreen()));
-                      }
+                      logIn();
                     }
                   },
                   shape: RoundedRectangleBorder(
@@ -202,7 +223,16 @@ class _LogInScreenState extends State<LogInScreen> {
             Padding(
               padding: EdgeInsets.only(top: 20, left: 20, right: 20),
               child: RaisedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Future<String> user = _handleSignIn();
+                  if (signInState) {
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                HomeScreen(user.toString())));
+                  }
+                },
                 color: Colors.blue,
                 padding: EdgeInsets.all(10),
                 shape: RoundedRectangleBorder(
@@ -217,6 +247,33 @@ class _LogInScreenState extends State<LogInScreen> {
                     SizedBox(width: 10),
                     Text(
                       "Sign in with google",
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(top: 20, left: 20, right: 20),
+              child: RaisedButton(
+                onPressed: () {},
+                color: Colors.blue,
+                padding: EdgeInsets.all(10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Icon(
+                      FontAwesomeIcons.facebook,
+                      color: Colors.white,
+                    ),
+                    SizedBox(width: 10),
+                    Text(
+                      "Sign in with facebook",
                       style: TextStyle(
                         fontSize: 20,
                         color: Colors.white,

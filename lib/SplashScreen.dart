@@ -25,13 +25,12 @@ class _SplashScreenState extends State<SplashScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   MyImage(),
-                  Text(
-                    'SeveneSound',
-                    style: TextStyle(
+                  Text('SeveneSound',
+                      style: TextStyle(
                         fontSize: 25,
                         fontStyle: FontStyle.italic,
-                        color: Color(0xffff2fc3)),
-                  )
+                        color: Colors.blue,
+                      ))
                 ],
               ),
             ),
@@ -41,13 +40,12 @@ class _SplashScreenState extends State<SplashScreen> {
                 children: <Widget>[
                   CircularProgressIndicator(),
                   SizedBox(height: 20),
-                  Text(
-                    'Welcome to the SeveneSound',
-                    style: TextStyle(
+                  Text('Welcome to the SeveneSound',
+                      style: TextStyle(
                         fontSize: 18,
                         fontStyle: FontStyle.italic,
-                        color: Color(0xffff2fc3)),
-                  )
+                        color: Colors.blue,
+                      ))
                 ],
               ),
             ),
